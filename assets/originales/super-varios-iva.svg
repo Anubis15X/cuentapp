@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 615" width="460" height="615">
+<defs>
+  <filter id="sombra" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".25"/></filter>
+  <filter id="borroso"><feGaussianBlur stdDeviation="0"/></filter>
+  <linearGradient id="arr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".45" stop-color="#000" stop-opacity=".08"/><stop offset=".5" stop-color="#fff" stop-opacity=".3"/><stop offset=".55" stop-color="#000" stop-opacity=".06"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="460" height="615" fill="#d9cdbd"/>
+<g transform="translate(40 40) rotate(0 190 267.5)">
+  <g >
+  <rect width="380" height="535" fill="#ffffff" filter="url(#sombra)"/>
+  <g font-family="Courier New, monospace" font-size="14" fill="#222"><text x="190" y="43" text-anchor="middle" font-weight="700">SUPERMERCADOS RIBERA S.A.</text><text x="190" y="64" text-anchor="middle">NIF A28456789</text><text x="190" y="85" text-anchor="middle">C/ Mayor 14 - Palencia</text><line x1="26" x2="354" y1="101" y2="101" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="127">Fra. simplificada 2026/118734</text><text x="26" y="148">15/10/2026 18:22  Caja 03</text><line x1="26" x2="354" y1="164" y2="164" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="190">LECHE ENTERA 6x1L</text><text x="354" y="190" text-anchor="end">6,24</text><text x="26" y="211">PAN DE MOLDE</text><text x="354" y="211" text-anchor="end">2,10</text><text x="26" y="232">HUEVOS DOCENA</text><text x="354" y="232" text-anchor="end">4,16</text><text x="26" y="253">ACEITE OLIVA 1L</text><text x="354" y="253" text-anchor="end">9,90</text><text x="26" y="274">CAFE MOLIDO 500G</text><text x="354" y="274" text-anchor="end">6,95</text><text x="26" y="295">AGUA 6x1,5L</text><text x="354" y="295" text-anchor="end">5,05</text><text x="26" y="316">DETERGENTE</text><text x="354" y="316" text-anchor="end">4,99</text><text x="26" y="337">PAPEL COCINA</text><text x="354" y="337" text-anchor="end">5,61</text><line x1="26" x2="354" y1="353" y2="353" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="379">TIPO   BASE   CUOTA</text><text x="354" y="379" text-anchor="end"></text><text x="26" y="400">4%    12,50    0,50</text><text x="354" y="400" text-anchor="end"></text><text x="26" y="421">10%   20,00    2,00</text><text x="354" y="421" text-anchor="end"></text><text x="26" y="442">21%    8,26    1,74</text><text x="354" y="442" text-anchor="end"></text><line x1="26" x2="354" y1="458" y2="458" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="484" font-weight="700">TOTAL A PAGAR        45,00 EUR</text><text x="26" y="505">EFECTIVO 50,00  CAMBIO 5,00</text></g>
+  
+  </g>
+</g>
+
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 468" width="460" height="468">
+<defs>
+  <filter id="sombra" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".25"/></filter>
+  <filter id="borroso"><feGaussianBlur stdDeviation="0"/></filter>
+  <linearGradient id="arr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".45" stop-color="#000" stop-opacity=".08"/><stop offset=".5" stop-color="#fff" stop-opacity=".3"/><stop offset=".55" stop-color="#000" stop-opacity=".06"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="460" height="468" fill="#d9cdbd"/>
+<g transform="translate(40 40) rotate(0 190 194)">
+  <g >
+  <rect width="380" height="388" fill="#fbf8f1" filter="url(#sombra)"/>
+  <g font-family="Courier New, monospace" font-size="14" fill="#222"><text x="190" y="43" text-anchor="middle" font-weight="700">ESTACION DE SERVICIO LOS PINOS</text><text x="190" y="64" text-anchor="middle">CIF: B47123456</text><text x="190" y="85" text-anchor="middle">Ctra. N-601 km 12, Valladolid</text><line x1="26" x2="354" y1="101" y2="101" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="127">FACTURA SIMPLIFICADA</text><text x="26" y="148">N.: T-004512   12/10/2026 08:41</text><line x1="26" x2="354" y1="164" y2="164" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="190">GASOLEO A  33,74 L x 1,630</text><text x="354" y="190" text-anchor="end">55,00</text><line x1="26" x2="354" y1="206" y2="206" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="232">BASE IMPONIBLE</text><text x="354" y="232" text-anchor="end">45,45</text><text x="26" y="253">IVA 21%</text><text x="354" y="253" text-anchor="end">9,55</text><text x="26" y="274"></text><text x="26" y="295">TOTAL EUR</text><text x="354" y="295" text-anchor="end">55,00</text><line x1="26" x2="354" y1="311" y2="311" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="337">TARJETA ****4821</text><text x="190" y="358" text-anchor="middle">GRACIAS POR SU VISITA</text></g>
+  <g stroke="#000" stroke-opacity=".12" stroke-width="2" fill="none">
+      <path d="M0 116.39999999999999 L152 131.92000000000002 L380 108.64000000000001"/>
+      <path d="M235.6 0 L220.39999999999998 194 L250.8 388"/>
+      <path d="M0 279.36 L380 294.88"/></g>
+      <rect width="380" height="388" fill="url(#arr)" opacity=".5"/>
+  </g>
+</g>
+
+</svg>

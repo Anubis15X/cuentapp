@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Documentos · CUENTAPP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main id="contenido" class="contenido">
+    <div class="cabecera-pagina">
+      <div>
+        <span class="script">tus justificantes</span>
+        <h1>Documentos</h1>
+      </div>
+      <a class="btn btn-primario" href="subir.html">Subir documento</a>
+    </div>
+
+    <section class="tarjeta">
+      <div class="fila" style="margin-bottom:16px;align-items:flex-end">
+        <div class="campo" style="margin:0;flex:1;min-width:200px">
+          <label for="buscar">Buscar</label>
+          <input id="buscar" type="search" placeholder="Emisor, NIF, número o archivo">
+        </div>
+        <div class="campo" style="margin:0">
+          <label for="f-trimestre">Trimestre</label>
+          <select id="f-trimestre"></select>
+        </div>
+        <div class="campo" style="margin:0">
+          <label for="f-nivel">Estado</label>
+          <select id="f-nivel">
+            <option value="">Todos</option>
+            <option value="rojo">Bloqueantes</option>
+            <option value="ambar">Por revisar</option>
+            <option value="validado">Validados</option>
+            <option value="descartado">Descartados</option>
+          </select>
+        </div>
+      </div>
+      <div class="tabla-envoltorio"><table class="tabla" id="tabla"></table></div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    (async () => {
+      const { api, ui } = CuentApp;
+      if (!await ui.montarApp("documentos")) return;
+
+      const selT = document.getElementById("f-trimestre");
+      const selN = document.getElementById("f-nivel");
+      const buscar = document.getElementById("buscar");
+      const trimestres = await api.trimestresDisponibles();
+      selT.innerHTML = '<option value="">Todos</option>' + trimestres.map(t => `<option value="${t}">${ui.nombreTrimestre(t)}</option>`).join("");
+      selT.value = ui.parametro("t") || "";
+      selN.value = ui.parametro("nivel") || "";
+
+      const todos = await api.listarDocumentos();
+
+      function pintar() {
+        const q = buscar.value.trim().toLowerCase();
+        const docs = todos.filter(d => {
+          if (selT.value && api.trimestreDe(d) !== selT.value) return false;
+          const nivel = api.nivelDocumento(d);
+          if (selN.value === "descartado") { if (d.estado !== "descartado") return false; }
+          else if (d.estado === "descartado" && selN.value) return false;
+          if (selN.value === "validado" && nivel !== "verde") return false;
+          if ((selN.value === "rojo" || selN.value === "ambar") && nivel !== selN.value) return false;
+          if (q) {
+            const f = d.factura;
+            const texto = [f.emisor, f.nif_emisor, f.numero, d.archivo, f.categoria].join(" ").toLowerCase();
+            if (!texto.includes(q)) return false;
+          }
+          return true;
+        });
+
+        document.getElementById("tabla").innerHTML = docs.length ? `
+          <thead><tr><th>Emisor</th><th>Nº</th><th>Fecha</th><th>Categoría</th><th>Origen</th><th class="der">Total</th><th>Estado</th></tr></thead>
+          <tbody>${docs.map(d => `
+            <tr class="clic" data-id="${d.id}">
+              <td><b>${ui.esc(d.factura.emisor || "Sin leer")}</b><br><span class="suave" style="font-size:.82rem">${ui.esc(d.archivo)}</span></td>
+              <td class="num">${ui.esc(d.factura.numero || "—")}</td>
+              <td class="num" style="white-space:nowrap">${ui.fecha(d.factura.fecha)}</td>
+              <td>${ui.esc(d.factura.categoria || "—")}</td>
+              <td>${ui.ORIGEN[d.origen]}</td>
+              <td class="der num" style="white-space:nowrap">${ui.dinero(d.factura.total, d.factura.moneda)}</td>
+              <td>${ui.pildoraEstado(d)}</td>
+            </tr>`).join("")}</tbody>`
+          : `<tbody><tr><td><div class="vacio-estado"><span class="script">nada por aquí</span>No hay documentos con estos filtros.</div></td></tr></tbody>`;
+      }
+
+      [selT, selN].forEach(s => s.addEventListener("change", pintar));
+      buscar.addEventListener("input", pintar);
+      document.getElementById("tabla").addEventListener("click", e => {
+        const fila = e.target.closest("tr[data-id]");
+        if (fila) location.href = "revisar.html?id=" + fila.dataset.id;
+      });
+      pintar();
+    })();
+  </script>
+</body>
+</html>

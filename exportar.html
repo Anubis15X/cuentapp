@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exportar · CUENTAPP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main id="contenido" class="contenido">
+    <div class="cabecera-pagina">
+      <div>
+        <span class="script">para tu gestoría</span>
+        <h1>Exportar</h1>
+      </div>
+      <div class="selector-trimestre" id="trimestres" aria-label="Trimestre"></div>
+    </div>
+
+    <section class="tarjeta" style="margin-bottom:20px">
+      <div class="resumen-semaforo">
+        <div class="semaforo horizontal" id="semaforo"><i></i><i></i><i></i></div>
+        <div style="flex:1;min-width:220px">
+          <span class="etiqueta" id="t-nombre"></span>
+          <div class="estado-grande" id="s-titulo" style="font-size:1.5rem"></div>
+          <p class="suave" id="resumen" style="margin:4px 0 0"></p>
+        </div>
+        <button class="btn btn-primario" id="descargar">Descargar Excel</button>
+      </div>
+      <div id="aviso-estado" style="margin-top:16px"></div>
+      <label class="fila" style="margin-top:14px;font-size:.92rem;gap:8px">
+        <input type="checkbox" id="solo-validados"> Incluir solo documentos validados
+      </label>
+    </section>
+
+    <section class="tarjeta" style="margin-bottom:20px">
+      <div class="tarjeta-titulo"><h3>Facturas</h3><span class="ayuda">Hoja 1 del Excel</span></div>
+      <div class="tabla-envoltorio"><table class="tabla" id="t-facturas"></table></div>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-titulo"><h3>Desglose de IVA</h3><span class="ayuda">Hoja 2 del Excel · una fila por tipo</span></div>
+      <div class="tabla-envoltorio"><table class="tabla" id="t-iva"></table></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    (async () => {
+      const { api, ui } = CuentApp;
+      const ctx = await ui.montarApp("exportar");
+      if (!ctx) return;
+      const $ = s => document.getElementById(s);
+
+      const trimestres = await api.trimestresDisponibles();
+      let actual = ui.parametro("t") || api.trimestreActual();
+      let filas = { facturas: [], desglose: [] };
+
+      $("trimestres").addEventListener("click", e => {
+        const t = e.target.closest("button")?.dataset.t;
+        if (!t) return;
+        actual = t;
+        history.replaceState(null, "", "?t=" + t);
+        pintar();
+      });
+      $("solo-validados").addEventListener("change", pintar);
+
+      function tabla(el, rows, columnas, numericas) {
+        if (!rows.length) { el.innerHTML = `<tbody><tr><td class="suave">Sin datos para este periodo.</td></tr></tbody>`; return; }
+        el.innerHTML = `<thead><tr>${columnas.map(c => `<th class="${numericas.includes(c) ? "der" : ""}">${c}</th>`).join("")}</tr></thead>
+          <tbody>${rows.map(r => `<tr>${columnas.map(c => {
+            const v = r[c];
+            const n = numericas.includes(c);
+            return `<td class="${n ? "der num" : ""}" style="white-space:nowrap">${n && v !== "" ? Number(v).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : ui.esc(v)}</td>`;
+          }).join("")}</tr>`).join("")}</tbody>`;
+      }
+
+      async function pintar() {
+        $("trimestres").innerHTML = trimestres.map(t => `<button aria-pressed="${t === actual}" data-t="${t}">${ui.nombreTrimestre(t)}</button>`).join("");
+        let docs = await api.listarDocumentos({ trimestre: actual });
+        const s = api.semaforo(docs);
+        if ($("solo-validados").checked) docs = docs.filter(d => d.estado === "validado");
+        filas = api.filasExportacion(docs);
+
+        $("semaforo").className = "semaforo horizontal " + s.estado;
+        $("t-nombre").textContent = ui.nombreTrimestre(actual);
+        $("s-titulo").textContent = ui.TEXTO_SEMAFORO[s.estado][0];
+        const totalEUR = filas.facturas.reduce((a, f) => a + (Number(f["Total EUR"]) || 0), 0);
+        $("resumen").textContent = `${filas.facturas.length} documentos · ${filas.desglose.length} líneas de IVA · ${ui.dinero(totalEUR)} en total`;
+        $("descargar").disabled = !filas.facturas.length;
+
+        $("aviso-estado").innerHTML = s.estado === "rojo"
+          ? `<div class="aviso aviso-rojo">${ui.icono("alerta")}<span>Hay incidencias bloqueantes. Puedes exportar, pero el Excel indicará el estado de cada documento. <a href="panel.html?t=${actual}">Ir a resolverlas</a></span></div>`
+          : s.estado === "ambar"
+          ? `<div class="aviso aviso-ambar">${ui.icono("info")}<span>Quedan documentos por revisar. La columna «Estado revisión» lo indica en el Excel.</span></div>`
+          : "";
+
+        tabla($("t-facturas"), filas.facturas,
+          ["Fecha", "Nº factura", "Emisor", "NIF emisor", "Categoría", "Moneda", "Total (moneda original)", "Total EUR", "Estado revisión"],
+          ["Total (moneda original)", "Total EUR"]);
+        tabla($("t-iva"), filas.desglose,
+          ["Fecha", "Nº factura", "Emisor", "Tipo IVA %", "Base", "Cuota", "Moneda", "Base EUR", "Cuota EUR"],
+          ["Tipo IVA %", "Base", "Cuota", "Base EUR", "Cuota EUR"]);
+      }
+
+      $("descargar").addEventListener("click", () => {
+        if (typeof XLSX === "undefined") { ui.aviso("No se ha podido cargar la librería de Excel. Revisa la conexión."); return; }
+        const libro = XLSX.utils.book_new();
+        const formatear = (hoja, cols) => {
+          // Fechas como fecha real de Excel e importes con dos decimales
+          const rango = XLSX.utils.decode_range(hoja["!ref"]);
+          const cab = [];
+          for (let c = rango.s.c; c <= rango.e.c; c++) cab.push(hoja[XLSX.utils.encode_cell({ r: 0, c })].v);
+          for (let r = 1; r <= rango.e.r; r++) cab.forEach((nombre, c) => {
+            const celda = hoja[XLSX.utils.encode_cell({ r, c })];
+            if (!celda || celda.v === "") return;
+            if (nombre.startsWith("Fecha") && typeof celda.v === "string") { celda.t = "d"; celda.v = new Date(celda.v + "T00:00:00"); celda.z = "dd/mm/yyyy"; }
+            else if (celda.t === "n" && !nombre.includes("%") && !nombre.includes("cambio")) celda.z = "#,##0.00";
+          });
+          hoja["!cols"] = cab.map(n => ({ wch: Math.max(12, n.length + 2) }));
+          hoja["!autofilter"] = { ref: hoja["!ref"] };
+        };
+        const h1 = XLSX.utils.json_to_sheet(filas.facturas);
+        const h2 = XLSX.utils.json_to_sheet(filas.desglose);
+        formatear(h1); formatear(h2);
+        XLSX.utils.book_append_sheet(libro, h1, "Facturas");
+        XLSX.utils.book_append_sheet(libro, h2, "Desglose IVA");
+        const nombreEmpresa = ctx.empresa.nombre.replace(/[^\wÁÉÍÓÚÑáéíóúñ]+/g, "_").replace(/_+$/, "");
+        XLSX.writeFile(libro, `CUENTAPP_${nombreEmpresa}_${actual}.xlsx`, { cellDates: true });
+        ui.aviso("Excel descargado");
+      });
+
+      pintar();
+    })();
+  </script>
+</body>
+</html>

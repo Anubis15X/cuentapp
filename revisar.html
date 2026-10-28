@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Revisar documento · CUENTAPP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main id="contenido" class="contenido" style="max-width:1400px">
+    <div class="cabecera-pagina">
+      <div style="min-width:0">
+        <a href="documentos.html" class="btn btn-fantasma btn-sm" id="volver" style="margin-left:-12px"></a>
+        <h1 id="titulo" style="font-size:clamp(1.5rem,3vw,2.2rem);text-transform:none;overflow-wrap:anywhere"></h1>
+        <div class="fila" id="meta" style="font-size:.88rem"></div>
+      </div>
+    </div>
+
+    <div id="incidencias" class="lista-avisos" style="margin-bottom:20px"></div>
+
+    <div class="revision">
+      <!-- Original (RF-08) -->
+      <section class="visor" aria-label="Documento original">
+        <div class="visor-lienzo" id="lienzo"></div>
+        <div class="visor-barra">
+          <div class="fila" style="gap:6px">
+            <button class="btn btn-secundario btn-sm" id="z-menos" title="Alejar"></button>
+            <button class="btn btn-secundario btn-sm" id="z-mas" title="Acercar"></button>
+            <button class="btn btn-secundario btn-sm" id="girar" title="Girar"></button>
+          </div>
+          <span>Original intacto · <span id="huella"></span></span>
+          <a class="btn btn-secundario btn-sm" id="descargar" download>Descargar original</a>
+        </div>
+      </section>
+
+      <!-- Datos (RF-05, RF-06) -->
+      <form class="tarjeta" id="form" novalidate>
+        <div class="tarjeta-titulo"><h3>Datos extraídos</h3><span class="ayuda" id="n-dudosos"></span></div>
+
+        <div class="rejilla rejilla-2" style="gap:0 14px">
+          <div class="campo" data-c="fecha"><label for="fecha">Fecha</label><input id="fecha" type="date"></div>
+          <div class="campo" data-c="tipo"><label for="tipo">Tipo de documento</label>
+            <select id="tipo"><option value="">Sin indicar</option><option value="completa">Factura completa</option><option value="simplificada">Factura simplificada / ticket</option></select></div>
+        </div>
+        <div class="campo" data-c="emisor"><label for="emisor">Emisor</label><input id="emisor" autocomplete="off"></div>
+        <div class="rejilla rejilla-2" style="gap:0 14px">
+          <div class="campo" data-c="nif_emisor"><label for="nif_emisor">NIF emisor</label><input id="nif_emisor" autocomplete="off"></div>
+          <div class="campo" data-c="nif_receptor"><label for="nif_receptor">NIF receptor</label><input id="nif_receptor" autocomplete="off"><span class="ayuda" id="ayuda-receptor"></span></div>
+          <div class="campo" data-c="numero"><label for="numero">Nº de factura</label><input id="numero" autocomplete="off"></div>
+          <div class="campo" data-c="categoria"><label for="categoria">Categoría</label><select id="categoria"></select></div>
+        </div>
+
+        <div class="rejilla rejilla-2" style="gap:0 14px">
+          <div class="campo" data-c="moneda"><label for="moneda">Moneda</label>
+            <select id="moneda"><option>EUR</option><option>USD</option><option>GBP</option><option>CHF</option></select></div>
+          <div class="campo" data-c="total"><label for="total">Total</label><input id="total" type="number" step="0.01" inputmode="decimal"></div>
+        </div>
+
+        <div id="bloque-cambio" class="oculto">
+          <div class="rejilla rejilla-2" style="gap:0 14px">
+            <div class="campo" data-c="tipo_cambio"><label for="tipo_cambio">Tipo de cambio (1 EUR = )</label><input id="tipo_cambio" type="number" step="0.0001" inputmode="decimal"></div>
+            <div class="campo" data-c="fecha_cambio"><label for="fecha_cambio">Fecha del tipo</label><input id="fecha_cambio" type="date"></div>
+          </div>
+          <div class="aviso aviso-info" style="margin-bottom:14px"><span id="ico-cambio"></span><span>Equivalente en euros: <b id="total-eur"></b> · <span id="fuente-cambio"></span></span></div>
+        </div>
+
+        <div class="tarjeta-titulo" style="margin:10px 0 8px"><h3 style="font-size:1.05rem">Desglose de IVA</h3>
+          <button type="button" class="btn btn-fantasma btn-sm" id="add-iva">Añadir tipo</button></div>
+        <div class="lineas-iva" id="lineas"></div>
+        <div class="cuadre" id="cuadre"></div>
+
+        <details style="margin-top:20px">
+          <summary class="etiqueta" style="cursor:pointer">Historial</summary>
+          <ul class="historial" id="historial" style="padding-left:18px;margin:10px 0 0"></ul>
+        </details>
+
+        <div class="acciones-fijas">
+          <button type="button" class="btn btn-secundario" id="guardar">Guardar cambios</button>
+          <button type="button" class="btn btn-primario" id="validar">Validar</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    (async () => {
+      const { api, ui } = CuentApp;
+      if (!await ui.montarApp("documentos")) return;
+
+      const id = ui.parametro("id");
+      let doc;
+      try { doc = await api.obtenerDocumento(id); }
+      catch (e) {
+        document.getElementById("contenido").innerHTML = `<div class="vacio-estado"><span class="script">vaya</span>${ui.esc(e.message)}<p><a href="documentos.html">Volver a documentos</a></p></div>`;
+        return;
+      }
+
+      const $ = s => document.getElementById(s);
+      $("volver").innerHTML = ui.icono("volver") + "Documentos";
+      $("z-mas").innerHTML = ui.icono("lupaMas");
+      $("z-menos").innerHTML = ui.icono("lupaMenos");
+      $("girar").innerHTML = ui.icono("girar");
+      $("descargar").insertAdjacentHTML("afterbegin", ui.icono("descargar"));
+      $("ico-cambio").innerHTML = ui.icono("info");
+      $("categoria").innerHTML = '<option value="">Sin categoría</option>' + api.CATEGORIAS.map(c => `<option>${c}</option>`).join("");
+
+      // ---------- Original ----------
+      const url = await api.urlOriginal(doc);
+      let zoom = 1, giro = 0;
+      if (!url) {
+        $("lienzo").innerHTML = `<div class="vacio-estado" style="color:var(--arena)">Original no disponible en esta demo.</div>`;
+        $("descargar").classList.add("oculto");
+      } else if (url.startsWith("data:application/pdf")) {
+        $("lienzo").innerHTML = `<iframe src="${url}" title="Original"></iframe>`;
+        ["z-mas", "z-menos", "girar"].forEach(b => $(b).classList.add("oculto"));
+      } else {
+        $("lienzo").innerHTML = `<img id="img-original" src="${url}" alt="Original de ${ui.esc(doc.archivo)}">`;
+      }
+      $("descargar").href = url || "#";
+      $("descargar").setAttribute("download", doc.archivo);
+      $("huella").textContent = "huella " + doc.huella.slice(0, 10) + "…";
+      const img = () => $("img-original");
+      function ajustar() {
+        const i = img(); if (!i) return;
+        const ancho = $("lienzo").clientWidth - 32;
+        i.style.width = Math.round(ancho * zoom) + "px";
+        i.style.transform = `rotate(${giro}deg)`;
+      }
+      if (img()) img().addEventListener("load", ajustar);
+      addEventListener("resize", ajustar);
+      $("z-mas").onclick = () => { zoom = Math.min(3, zoom + .25); ajustar(); };
+      $("z-menos").onclick = () => { zoom = Math.max(.5, zoom - .25); ajustar(); };
+      $("girar").onclick = () => { giro = (giro + 90) % 360; ajustar(); };
+
+      // ---------- Formulario ----------
+      const CAMPOS = ["fecha", "tipo", "emisor", "nif_emisor", "nif_receptor", "numero", "categoria", "moneda", "total", "tipo_cambio", "fecha_cambio"];
+      let lineas = [];
+      let inicial = "";
+
+      function cabecera() {
+        $("titulo").textContent = doc.factura.emisor || doc.archivo;
+        $("meta").innerHTML = `${ui.pildoraEstado(doc)}<span class="suave">${ui.esc(doc.archivo)} · ${ui.ORIGEN[doc.origen]} · recibido ${ui.fecha(doc.recibido_en)}</span>`;
+        $("historial").innerHTML = doc.historial.slice().reverse().map(h => `<li>${ui.fecha(h.fecha)} · ${ui.esc(h.texto)}</li>`).join("");
+        const rojo = api.nivelDocumento(doc) === "rojo";
+        $("validar").disabled = rojo || doc.estado === "descartado";
+        $("validar").title = rojo ? "Resuelve antes las incidencias bloqueantes" : "";
+        $("validar").textContent = doc.estado === "validado" ? "Validado ✓" : "Validar";
+      }
+
+      function rellenar() {
+        const f = doc.factura;
+        CAMPOS.forEach(c => { $(c).value = f[c] ?? ""; });
+        if (!f.moneda) $("moneda").value = "EUR";
+        lineas = (f.iva || []).map(l => ({ ...l }));
+        if (!lineas.length) lineas.push({ base: "", tipo: 21, cuota: "" });
+        pintarLineas();
+        marcarDudosos();
+        cambioMoneda();
+        inicial = JSON.stringify(leer());
+      }
+
+      function marcarDudosos() {
+        document.querySelectorAll(".campo[data-c]").forEach(el => {
+          const c = el.dataset.c;
+          el.classList.toggle("dudoso", doc.dudosos.includes(c));
+          const v = $(c) && $(c).value;
+          el.classList.toggle("vacio", !v);
+        });
+        const n = doc.dudosos.length;
+        $("n-dudosos").textContent = n ? n + (n === 1 ? " campo dudoso" : " campos dudosos") : "";
+        const simpl = $("tipo").value === "simplificada";
+        $("ayuda-receptor").textContent = simpl ? "En un ticket simplificado puede no aparecer." : "";
+      }
+
+      function pintarLineas() {
+        $("lineas").innerHTML = lineas.map((l, i) => `
+          <div class="linea-iva" data-i="${i}">
+            <div class="campo"><label>Base</label><input type="number" step="0.01" inputmode="decimal" data-k="base" value="${l.base ?? ""}"></div>
+            <div class="campo"><label>IVA %</label><select data-k="tipo">${[0, 4, 5, 10, 21].map(t => `<option ${Number(l.tipo) === t ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+            <div class="campo"><label>Cuota</label><input type="number" step="0.01" inputmode="decimal" data-k="cuota" value="${l.cuota ?? ""}"></div>
+            <button type="button" class="btn btn-fantasma btn-sm" data-quitar="${i}" title="Quitar línea" ${lineas.length === 1 ? "disabled" : ""}>${ui.icono("papelera")}</button>
+          </div>`).join("");
+        recalcular();
+      }
+
+      $("lineas").addEventListener("input", e => {
+        const fila = e.target.closest(".linea-iva");
+        if (!fila) return;
+        const l = lineas[fila.dataset.i];
+        const k = e.target.dataset.k;
+        l[k] = e.target.value === "" ? "" : Number(e.target.value);
+        // Al cambiar base o tipo, se propone la cuota
+        if ((k === "base" || k === "tipo") && l.base !== "") {
+          l.cuota = api.redondear(l.base * l.tipo / 100);
+          fila.querySelector("[data-k=cuota]").value = l.cuota;
+        }
+        recalcular();
+      });
+      $("lineas").addEventListener("change", e => { if (e.target.tagName === "SELECT") $("lineas").dispatchEvent(new Event("input")); });
+      $("lineas").addEventListener("click", e => {
+        const b = e.target.closest("[data-quitar]");
+        if (b) { lineas.splice(Number(b.dataset.quitar), 1); pintarLineas(); }
+      });
+      $("add-iva").onclick = () => { lineas.push({ base: "", tipo: 10, cuota: "" }); pintarLineas(); };
+
+      function leer() {
+        const f = { ...doc.factura };
+        CAMPOS.forEach(c => {
+          const v = $(c).value.trim();
+          f[c] = v === "" ? null : ["total", "tipo_cambio"].includes(c) ? Number(v) : v;
+        });
+        if (f.nif_emisor) f.nif_emisor = f.nif_emisor.toUpperCase();
+        if (f.nif_receptor) f.nif_receptor = f.nif_receptor.toUpperCase();
+        f.iva = lineas.filter(l => l.base !== "" && l.base != null).map(l => ({ base: Number(l.base), tipo: Number(l.tipo), cuota: Number(l.cuota || 0) }));
+        if (f.moneda === "EUR") { f.tipo_cambio = null; f.fecha_cambio = null; f.fuente_cambio = null; f.total_eur = f.total; }
+        else f.total_eur = f.total != null && f.tipo_cambio ? api.redondear(f.total / f.tipo_cambio) : null;
+        return f;
+      }
+
+      function recalcular() {
+        const f = leer();
+        const c = api.cuadre(f);
+        const el = $("cuadre");
+        if (!c) { el.className = "cuadre"; el.innerHTML = "<span>Introduce bases y total para comprobar el cuadre</span>"; }
+        else {
+          el.className = "cuadre " + (c.ok ? "bien" : "mal");
+          el.innerHTML = `<span>Bases + cuotas: <b class="num">${ui.dinero(c.suma, f.moneda)}</b></span><span>${c.ok ? "Cuadra con el total ✓" : "Diferencia " + ui.dinero(c.diferencia, f.moneda)}</span>`;
+        }
+        if (f.moneda !== "EUR") {
+          $("total-eur").textContent = ui.dinero(f.total_eur);
+          $("fuente-cambio").textContent = doc.factura.fuente_cambio || "tipo introducido a mano";
+        }
+      }
+
+      function cambioMoneda() {
+        $("bloque-cambio").classList.toggle("oculto", $("moneda").value === "EUR");
+        recalcular();
+      }
+      $("moneda").addEventListener("change", cambioMoneda);
+      $("form").addEventListener("input", e => { if (!e.target.closest(".linea-iva")) { recalcular(); marcarDudosos(); } });
+
+      function camposCambiados(f) {
+        const antes = doc.factura;
+        return CAMPOS.filter(c => String(antes[c] ?? "") !== String(f[c] ?? "")).concat(
+          JSON.stringify(antes.iva || []) !== JSON.stringify(f.iva) ? ["iva"] : []);
+      }
+
+      async function guardar() {
+        const f = leer();
+        if (f.fecha && f.fecha > new Date().toISOString().slice(0, 10)) throw new Error("La fecha no puede ser futura.");
+        if (f.total != null && f.total < 0) throw new Error("El total no puede ser negativo.");
+        if (f.moneda !== "EUR" && f.total != null && !f.tipo_cambio) throw new Error("Indica el tipo de cambio para convertir a euros.");
+        const campos = camposCambiados(f);
+        // Al revisar en pantalla, los campos con valor se dan por comprobados
+        const revisados = doc.dudosos.filter(c => f[c] != null);
+        doc = await api.guardarFactura(doc.id, f, { campos: [...new Set([...campos, ...revisados])] });
+        inicial = JSON.stringify(leer());
+        return campos;
+      }
+
+      $("guardar").onclick = async () => {
+        try {
+          const campos = await guardar();
+          ui.aviso(campos.length ? "Cambios guardados. El original no se ha modificado." : "Sin cambios que guardar");
+          refrescar();
+        } catch (e) { ui.aviso(e.message); }
+      };
+
+      $("validar").onclick = async () => {
+        try {
+          const f = leer();
+          const faltan = ["fecha", "emisor", "total"].filter(c => f[c] == null);
+          if (faltan.length) throw new Error("Para validar faltan: " + faltan.join(", ") + ".");
+          await guardar();
+          if (api.nivelDocumento(doc) === "rojo") { refrescar(); throw new Error("Hay una incidencia bloqueante: revísala antes de validar."); }
+          doc = await api.validarDocumento(doc.id);
+          ui.aviso("Documento validado");
+          refrescar();
+        } catch (e) { ui.aviso(e.message); }
+      };
+
+      // ---------- Incidencias ----------
+      function pintarIncidencias() {
+        const cont = $("incidencias");
+        let html = "";
+        if (doc.estado === "descartado") {
+          html += `<div class="aviso aviso-info">${ui.icono("info")}<div style="flex:1">Este documento está <b>descartado</b>: no cuenta en el semáforo ni en el Excel. El original se conserva.</div><button class="btn btn-secundario btn-sm" data-restaurar>Recuperar</button></div>`;
+        }
+        doc.incidencias.forEach((inc, i) => {
+          if (inc.resuelta) return;
+          const rojo = inc.gravedad === "bloqueante";
+          let acciones = "";
+          if (inc.tipo === "duplicado") acciones = `
+            ${inc.relacionado ? `<a class="btn btn-secundario btn-sm" href="revisar.html?id=${inc.relacionado}">Ver el otro</a>` : ""}
+            <button class="btn btn-secundario btn-sm" data-accion="no_duplicado" data-i="${i}">No es duplicado</button>
+            <button class="btn btn-peligro btn-sm" data-accion="descartar" data-i="${i}">Descartar este</button>`;
+          else if (inc.tipo === "ilegible") acciones = `
+            <button class="btn btn-secundario btn-sm" data-accion="manual" data-i="${i}">Introducir a mano</button>
+            <button class="btn btn-peligro btn-sm" data-accion="descartar" data-i="${i}">Descartar</button>`;
+          html += `<div class="aviso aviso-${rojo ? "rojo" : "ambar"}" style="flex-wrap:wrap">${ui.icono(rojo ? "alerta" : "info")}
+            <div style="flex:1;min-width:200px"><b>${rojo ? "Incidencia bloqueante" : "Aviso"}:</b> ${ui.esc(inc.mensaje)}</div>
+            <div class="fila" style="gap:6px">${acciones}</div></div>`;
+        });
+        cont.innerHTML = html;
+        cont.classList.toggle("oculto", !html);
+      }
+      $("incidencias").addEventListener("click", async e => {
+        const b = e.target.closest("[data-accion],[data-restaurar]");
+        if (!b) return;
+        try {
+          if (b.dataset.restaurar !== undefined) doc = await api.restaurarDocumento(doc.id);
+          else doc = await api.resolverIncidencia(doc.id, Number(b.dataset.i), b.dataset.accion);
+          ui.aviso(b.dataset.accion === "descartar" ? "Descartado. El original se conserva." : "Incidencia actualizada");
+          refrescar();
+        } catch (err) { ui.aviso(err.message); }
+      });
+
+      addEventListener("beforeunload", e => { if (JSON.stringify(leer()) !== inicial) e.preventDefault(); });
+
+      function refrescar() { cabecera(); pintarIncidencias(); rellenar(); }
+      refrescar();
+    })();
+  </script>
+</body>
+</html>

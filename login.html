@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acceso · CUENTAPP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="acceso">
+    <aside class="acceso-lateral topo">
+      <a class="logo" href="index.html"><b>CUENTAPP</b></a>
+      <div>
+        <h2>Tus facturas, en orden</h2>
+        <span class="script">cada trimestre</span>
+        <p style="color:var(--arena);max-width:36ch;margin-top:20px">Foto, archivo o correo. Lectura automática, duplicados controlados y un semáforo que te dice cuándo está listo para la gestoría.</p>
+      </div>
+      <p style="color:var(--arena);font-size:.85rem;margin:0">Prototipo · cualquier correo y una contraseña de 6+ caracteres sirven para entrar.</p>
+    </aside>
+
+    <main class="acceso-form">
+      <div class="acceso-caja">
+        <a class="logo" href="index.html" style="margin-bottom:12px"><b>CUENTAPP</b></a>
+
+        <div class="pestanas" role="tablist">
+          <button role="tab" data-modo="entrar" aria-selected="true">Entrar</button>
+          <button role="tab" data-modo="registro" aria-selected="false">Crear cuenta</button>
+        </div>
+
+        <div id="mensaje" class="oculto" style="margin-bottom:16px"></div>
+
+        <!-- Entrar -->
+        <form id="f-entrar" data-panel="entrar" novalidate>
+          <h1 style="font-size:2rem;text-transform:none">Hola de nuevo</h1>
+          <p class="suave">Entra con el correo de tu empresa.</p>
+          <div class="campo"><label for="e-email">Correo</label><input id="e-email" type="email" autocomplete="email" required placeholder="tu@empresa.es"></div>
+          <div class="campo"><label for="e-pass">Contraseña</label><input id="e-pass" type="password" autocomplete="current-password" required minlength="6"></div>
+          <div class="fila entre" style="margin:-4px 0 20px">
+            <span></span>
+            <a href="#" id="a-recuperar" style="font-size:.9rem">¿Has olvidado la contraseña?</a>
+          </div>
+          <button class="btn btn-primario btn-bloque" type="submit">Entrar</button>
+        </form>
+
+        <!-- Registro -->
+        <form id="f-registro" data-panel="registro" class="oculto" novalidate>
+          <h1 style="font-size:2rem;text-transform:none">Empieza gratis</h1>
+          <p class="suave">14 días y 30 documentos. Sin tarjeta.</p>
+          <div class="campo"><label for="r-empresa">Nombre de la empresa</label><input id="r-empresa" required autocomplete="organization" placeholder="Panadería Ejemplo S.L."></div>
+          <div class="campo"><label for="r-nif">NIF de la empresa</label><input id="r-nif" required placeholder="B12345678" maxlength="9"></div>
+          <div class="campo"><label for="r-email">Correo</label><input id="r-email" type="email" required autocomplete="email"></div>
+          <div class="campo"><label for="r-pass">Contraseña</label><input id="r-pass" type="password" required minlength="8" autocomplete="new-password"><span class="ayuda">Mínimo 8 caracteres.</span></div>
+          <label class="fila" style="font-size:.88rem;align-items:flex-start;gap:10px;margin-bottom:20px">
+            <input type="checkbox" id="r-acepto" required style="margin-top:4px">
+            <span>Acepto las <a href="#">condiciones del servicio</a> y he leído la <a href="#">política de privacidad</a>.</span>
+          </label>
+          <button class="btn btn-primario btn-bloque" type="submit">Crear cuenta</button>
+        </form>
+
+        <!-- Recuperar -->
+        <form id="f-recuperar" data-panel="recuperar" class="oculto" novalidate>
+          <h1 style="font-size:2rem;text-transform:none">Recuperar acceso</h1>
+          <p class="suave">Te enviaremos un enlace para crear una contraseña nueva.</p>
+          <div class="campo"><label for="c-email">Correo</label><input id="c-email" type="email" required autocomplete="email"></div>
+          <button class="btn btn-primario btn-bloque" type="submit">Enviar enlace</button>
+          <p style="text-align:center;margin-top:16px"><a href="#" data-ir="entrar">Volver a entrar</a></p>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    const { api, ui } = CuentApp;
+    if (api.sesionActual()) location.href = "panel.html";
+
+    const msg = document.getElementById("mensaje");
+    function mostrarMensaje(texto, tipo) {
+      msg.className = "aviso aviso-" + tipo;
+      msg.textContent = texto;
+    }
+    function irA(modo) {
+      document.querySelectorAll("[data-panel]").forEach(f => f.classList.toggle("oculto", f.dataset.panel !== modo));
+      document.querySelectorAll("[role=tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.modo === modo));
+      msg.className = "oculto";
+    }
+    document.querySelectorAll("[role=tab]").forEach(b => b.addEventListener("click", () => irA(b.dataset.modo)));
+    document.getElementById("a-recuperar").addEventListener("click", e => { e.preventDefault(); irA("recuperar"); });
+    document.querySelector("[data-ir=entrar]").addEventListener("click", e => { e.preventDefault(); irA("entrar"); });
+    if (ui.parametro("modo") === "registro") irA("registro");
+
+    async function enviar(form, accion) {
+      const btn = form.querySelector("button[type=submit]");
+      btn.disabled = true;
+      try { await accion(); }
+      catch (e) { mostrarMensaje(e.message, "rojo"); }
+      finally { btn.disabled = false; }
+    }
+
+    document.getElementById("f-entrar").addEventListener("submit", e => {
+      e.preventDefault();
+      enviar(e.target, async () => {
+        await api.iniciarSesion(document.getElementById("e-email").value.trim(), document.getElementById("e-pass").value);
+        location.href = "panel.html";
+      });
+    });
+
+    document.getElementById("f-registro").addEventListener("submit", e => {
+      e.preventDefault();
+      enviar(e.target, async () => {
+        const empresa = document.getElementById("r-empresa").value.trim();
+        const nif = document.getElementById("r-nif").value.trim();
+        const email = document.getElementById("r-email").value.trim();
+        if (!empresa || !nif || !email) throw new Error("Rellena todos los campos.");
+        if (!/^[A-Za-z0-9]{9}$/.test(nif)) throw new Error("El NIF debe tener 9 caracteres.");
+        if (!document.getElementById("r-acepto").checked) throw new Error("Debes aceptar las condiciones para continuar.");
+        await api.registrarse({ email, password: document.getElementById("r-pass").value, empresa, nif });
+        location.href = "panel.html";
+      });
+    });
+
+    document.getElementById("f-recuperar").addEventListener("submit", e => {
+      e.preventDefault();
+      enviar(e.target, async () => {
+        await api.recuperarContrasena(document.getElementById("c-email").value.trim());
+        mostrarMensaje("Si existe una cuenta con ese correo, recibirás un enlace en unos minutos.", "verde");
+      });
+    });
+  </script>
+</body>
+</html>

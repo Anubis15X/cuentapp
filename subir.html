@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subir · CUENTAPP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main id="contenido" class="contenido">
+    <div class="cabecera-pagina">
+      <div>
+        <span class="script">envía tus tickets</span>
+        <h1>Subir</h1>
+      </div>
+    </div>
+
+    <div class="rejilla" id="rejilla" style="grid-template-columns:minmax(0,1fr)">
+      <div>
+        <!-- Foto desde el móvil (RF-02) -->
+        <label class="tarjeta-flecha" style="cursor:pointer;margin-bottom:16px" for="in-camara">
+          <span id="ico-camara"></span>
+          <div><strong>Hacer foto</strong><span>Abre la cámara del móvil y fotografía el ticket</span></div>
+        </label>
+        <input id="in-camara" type="file" accept="image/*" capture="environment" class="oculto">
+
+        <!-- Arrastrar archivo (RF-03) -->
+        <div class="zona-subida" id="zona" tabindex="0" role="button" aria-label="Seleccionar o arrastrar archivos">
+          <span id="ico-zona"></span>
+          <h3 style="margin-bottom:6px">Arrastra aquí tus facturas</h3>
+          <p class="suave" style="margin:0 0 16px">o <u>haz clic para elegir archivos</u></p>
+          <p class="ayuda" style="margin:0">PDF, JPG o PNG · máximo <span id="max-mb"></span> MB por archivo</p>
+        </div>
+        <input id="in-archivo" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" class="oculto">
+
+        <div class="cola" id="cola" aria-live="polite"></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- Reenvío por correo (RF-04 / FA-02) -->
+        <section class="tarjeta">
+          <div class="tarjeta-titulo"><h3>Reenvía por correo</h3><span id="ico-correo" style="color:var(--tostado)"></span></div>
+          <p class="suave" style="font-size:.92rem">Reenvía las facturas que te llegan por email a la dirección de tu empresa. Se procesan los adjuntos PDF, JPG y PNG.</p>
+          <div class="buzon-direccion"><span id="buzon" style="flex:1"></span><button class="btn btn-fantasma btn-sm" id="copiar"></button></div>
+          <p class="ayuda" style="margin-top:10px">Si el correo no trae adjuntos válidos, te avisaremos sin crear ningún documento.</p>
+        </section>
+
+        <section class="tarjeta">
+          <h3>Consejos para la foto</h3>
+          <ul class="suave" style="padding-left:18px;margin:0;font-size:.92rem">
+            <li>Apoya el ticket en una superficie oscura y lisa.</li>
+            <li>Que se vean los cuatro bordes.</li>
+            <li>Evita sombras y reflejos sobre los importes.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    (async () => {
+      const { api, ui } = CuentApp;
+      const ctx = await ui.montarApp("subir");
+      if (!ctx) return;
+      if (matchMedia("(min-width: 1060px)").matches) document.getElementById("rejilla").style.gridTemplateColumns = "minmax(0,1.6fr) minmax(0,1fr)";
+
+      document.getElementById("ico-camara").innerHTML = ui.icono("camara");
+      document.getElementById("ico-zona").innerHTML = ui.icono("subir", "icono-grande");
+      document.getElementById("ico-correo").innerHTML = ui.icono("correo");
+      document.getElementById("max-mb").textContent = CUENTAPP_CONFIG.tamanoMaximoMB;
+      document.getElementById("buzon").textContent = ctx.empresa.buzon;
+      const bc = document.getElementById("copiar");
+      bc.innerHTML = ui.icono("copiar");
+      bc.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(ctx.empresa.buzon); ui.aviso("Dirección copiada"); } catch (e) { ui.aviso("No se ha podido copiar"); }
+      });
+
+      const zona = document.getElementById("zona");
+      const inArchivo = document.getElementById("in-archivo");
+      const cola = document.getElementById("cola");
+
+      zona.addEventListener("click", () => inArchivo.click());
+      zona.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inArchivo.click(); } });
+      ["dragenter", "dragover"].forEach(ev => zona.addEventListener(ev, e => { e.preventDefault(); zona.classList.add("encima"); }));
+      ["dragleave", "drop"].forEach(ev => zona.addEventListener(ev, e => { e.preventDefault(); zona.classList.remove("encima"); }));
+      zona.addEventListener("drop", e => procesar([...e.dataTransfer.files], "archivo"));
+      inArchivo.addEventListener("change", () => { procesar([...inArchivo.files], "archivo"); inArchivo.value = ""; });
+      document.getElementById("in-camara").addEventListener("change", e => { procesar([...e.target.files], "foto"); e.target.value = ""; });
+
+      async function procesar(archivos, origen) {
+        // Uno detrás de otro para que el control de duplicados vea los anteriores
+        for (const file of archivos) await procesarUno(file, origen);
+      }
+
+      async function procesarUno(file, origen) {
+        const item = document.createElement("div");
+        item.className = "cola-item";
+        const esImagen = file.type.startsWith("image/");
+        const mini = esImagen ? `style="background-image:url('${URL.createObjectURL(file)}')"` : "";
+        const ext = (file.name.split(".").pop() || "").toUpperCase().slice(0, 4);
+        item.innerHTML = `
+          <div class="miniatura" ${mini}>${esImagen ? "" : ui.esc(ext)}</div>
+          <div class="info">
+            <div class="nombre">${ui.esc(file.name)}</div>
+            <div class="suave estado" style="font-size:.85rem">Preparando…</div>
+            <div class="progreso"><i></i></div>
+          </div>
+          <div class="accion"></div>`;
+        cola.prepend(item);
+        const estado = item.querySelector(".estado");
+        const barra = item.querySelector(".progreso i");
+
+        try {
+          const doc = await api.subirArchivo(file, origen, (texto, pct) => {
+            estado.textContent = texto + "…";
+            barra.style.width = pct + "%";
+          });
+          const dup = doc.estado === "incidencia";
+          estado.innerHTML = dup
+            ? `<span class="pildora p-rojo">Posible duplicado</span>`
+            : `<span class="pildora p-ambar">Pendiente de revisión</span>`;
+          item.querySelector(".progreso").remove();
+          item.querySelector(".accion").innerHTML = `<a class="btn btn-secundario btn-sm" href="revisar.html?id=${doc.id}">Revisar</a>`;
+        } catch (e) {
+          item.querySelector(".progreso").remove();
+          estado.innerHTML = `<span class="error-texto">${ui.esc(e.message)}</span>`;
+          item.style.borderColor = "#e6b6a8";
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

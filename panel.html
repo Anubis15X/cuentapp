@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel · CUENTAPP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main id="contenido" class="contenido">
+    <div class="cabecera-pagina">
+      <div>
+        <span class="script">el trimestre</span>
+        <h1>Panel</h1>
+      </div>
+      <div class="selector-trimestre" id="trimestres" aria-label="Trimestre"></div>
+    </div>
+
+    <!-- Semáforo -->
+    <section class="tarjeta topo" style="margin-bottom:20px">
+      <div class="resumen-semaforo">
+        <div class="semaforo" id="semaforo" role="img"><i></i><i></i><i></i></div>
+        <div style="flex:1;min-width:220px">
+          <span class="etiqueta" id="t-nombre"></span>
+          <div class="estado-grande" id="s-titulo"></div>
+          <p class="suave" id="s-texto" style="margin:4px 0 0"></p>
+        </div>
+        <div class="fila">
+          <a class="btn btn-secundario" href="subir.html">Subir documento</a>
+          <a class="btn btn-primario" id="btn-exportar" href="exportar.html">Exportar Excel</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contadores -->
+    <section class="rejilla rejilla-4" style="margin-bottom:20px;grid-template-columns:repeat(2,1fr)" id="contadores"></section>
+
+    <div class="rejilla" style="grid-template-columns:minmax(0,1fr)" id="zona-inferior">
+      <!-- Avisos -->
+      <section class="tarjeta">
+        <div class="tarjeta-titulo"><h3>Avisos</h3><span class="suave" id="n-avisos"></span></div>
+        <div class="lista-avisos" id="avisos"></div>
+      </section>
+
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <!-- Buzón (FA-02) -->
+        <section class="tarjeta">
+          <div class="tarjeta-titulo"><h3>Tu buzón</h3><span class="etiqueta">Correo</span></div>
+          <p class="suave" style="font-size:.92rem">Reenvía aquí facturas en PDF o imagen y aparecerán en CUENTAPP.</p>
+          <div class="buzon-direccion"><span id="buzon" style="flex:1"></span>
+            <button class="btn btn-fantasma btn-sm" id="copiar-buzon" title="Copiar dirección"></button>
+          </div>
+        </section>
+
+        <!-- Drive (FA-03) -->
+        <section class="tarjeta">
+          <div class="tarjeta-titulo"><h3>Google Drive</h3><span class="pildora p-gris" id="drive-estado">No conectado</span></div>
+          <p class="suave" style="font-size:.92rem">Copia ordenada de los originales validados por año, trimestre y categoría. Es opcional.</p>
+          <button class="btn btn-secundario btn-sm" id="btn-drive">Conectar Google Drive</button>
+        </section>
+      </div>
+    </div>
+
+    <!-- Recientes -->
+    <section class="tarjeta" style="margin-top:20px">
+      <div class="tarjeta-titulo"><h3>Últimos documentos</h3><a href="documentos.html" id="ver-todos" class="btn btn-fantasma btn-sm">Ver todos</a></div>
+      <div class="tabla-envoltorio"><table class="tabla" id="recientes"></table></div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    (async () => {
+      const { api, ui } = CuentApp;
+      const ctx = await ui.montarApp("panel");
+      if (!ctx) return;
+
+      // Dos columnas en pantallas anchas
+      if (matchMedia("(min-width: 1100px)").matches) document.getElementById("zona-inferior").style.gridTemplateColumns = "minmax(0,1.5fr) minmax(0,1fr)";
+      if (matchMedia("(min-width: 720px)").matches) document.getElementById("contadores").style.gridTemplateColumns = "repeat(4,1fr)";
+
+      const trimestres = await api.trimestresDisponibles();
+      let actual = ui.parametro("t") || api.trimestreActual();
+
+      document.getElementById("buzon").textContent = ctx.empresa.buzon;
+      const bCopiar = document.getElementById("copiar-buzon");
+      bCopiar.innerHTML = ui.icono("copiar");
+      bCopiar.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(ctx.empresa.buzon); ui.aviso("Dirección copiada"); }
+        catch (e) { ui.aviso("No se ha podido copiar"); }
+      });
+      document.getElementById("btn-drive").addEventListener("click", () =>
+        ui.aviso("En la versión final se abrirá la autorización de Google (OAuth) con permisos mínimos."));
+
+      function pintarSelector() {
+        document.getElementById("trimestres").innerHTML = trimestres.map(t =>
+          `<button aria-pressed="${t === actual}" data-t="${t}">${ui.nombreTrimestre(t)}</button>`).join("");
+      }
+      document.getElementById("trimestres").addEventListener("click", e => {
+        const t = e.target.closest("button")?.dataset.t;
+        if (!t) return;
+        actual = t;
+        history.replaceState(null, "", "?t=" + t);
+        pintar();
+      });
+
+      async function pintar() {
+        pintarSelector();
+        const docs = await api.listarDocumentos({ trimestre: actual });
+        const s = api.semaforo(docs);
+        const [titulo, texto] = ui.TEXTO_SEMAFORO[s.estado];
+
+        const sem = document.getElementById("semaforo");
+        sem.className = "semaforo " + s.estado;
+        sem.setAttribute("aria-label", "Semáforo: " + titulo);
+        document.getElementById("t-nombre").textContent = ui.nombreTrimestre(actual);
+        document.getElementById("s-titulo").textContent = titulo;
+        document.getElementById("s-texto").textContent = texto;
+        document.getElementById("btn-exportar").href = "exportar.html?t=" + actual;
+        document.getElementById("ver-todos").href = "documentos.html?t=" + actual;
+
+        document.getElementById("contadores").innerHTML = [
+          ["", s.total, "Registrados", ""],
+          ["c-verde", s.validados, "Validados", "validado"],
+          ["c-ambar", s.pendientes, "Por revisar", "ambar"],
+          ["c-rojo", s.bloqueantes, "Bloqueantes", "rojo"]
+        ].map(([c, n, t, f]) => `<a class="tarjeta contador ${c}" style="text-decoration:none;color:inherit" href="documentos.html?t=${actual}${f ? "&nivel=" + f : ""}"><b class="num">${n}</b><span>${t}</span></a>`).join("");
+
+        // Avisos: cada uno enlaza al justificante afectado
+        const avisos = [];
+        docs.forEach(d => {
+          const nivel = api.nivelDocumento(d);
+          if (!nivel || nivel === "verde") return;
+          const abiertas = d.incidencias.filter(i => !i.resuelta);
+          if (abiertas.length) abiertas.forEach(i => avisos.push({ d, nivel: i.gravedad === "bloqueante" ? "rojo" : "ambar", texto: i.mensaje }));
+          if (d.dudosos.length && nivel !== "rojo") avisos.push({ d, nivel: "ambar", texto: d.dudosos.length + (d.dudosos.length === 1 ? " campo dudoso" : " campos dudosos") });
+          else if (!abiertas.length && d.estado !== "validado") avisos.push({ d, nivel: "ambar", texto: "Pendiente de revisar" });
+        });
+        avisos.sort((a, b) => (a.nivel === "rojo" ? 0 : 1) - (b.nivel === "rojo" ? 0 : 1));
+        document.getElementById("n-avisos").textContent = avisos.length ? avisos.length + " abiertos" : "";
+        document.getElementById("avisos").innerHTML = avisos.length ? avisos.map(a => `
+          <a class="aviso aviso-${a.nivel}" href="revisar.html?id=${a.d.id}">
+            ${ui.icono(a.nivel === "rojo" ? "alerta" : "info")}
+            <div style="flex:1;min-width:0"><b>${ui.esc(a.texto)}</b><br><span style="opacity:.8;font-size:.85rem">${ui.esc(a.d.factura.emisor || a.d.archivo)} · ${ui.fecha(a.d.factura.fecha || a.d.recibido_en)}</span></div>
+            <span style="font-size:.85rem;white-space:nowrap">Revisar →</span>
+          </a>`).join("")
+          : `<div class="aviso aviso-verde">${ui.icono("check")}<span>No hay avisos en este trimestre.</span></div>`;
+
+        const recientes = docs.slice(0, 6);
+        document.getElementById("recientes").innerHTML = recientes.length ? `
+          <thead><tr><th>Documento</th><th>Fecha</th><th>Origen</th><th class="der">Total</th><th>Estado</th></tr></thead>
+          <tbody>${recientes.map(d => `
+            <tr class="clic" data-id="${d.id}">
+              <td><b>${ui.esc(d.factura.emisor || "Sin leer")}</b><br><span class="suave" style="font-size:.82rem">${ui.esc(d.archivo)}</span></td>
+              <td class="num">${ui.fecha(d.factura.fecha)}</td>
+              <td>${ui.ORIGEN[d.origen]}</td>
+              <td class="der num">${ui.dinero(d.factura.total, d.factura.moneda)}</td>
+              <td>${ui.pildoraEstado(d)}</td>
+            </tr>`).join("")}</tbody>`
+          : `<tbody><tr><td><div class="vacio-estado"><span class="script">todo en calma</span>No hay documentos en este trimestre.</div></td></tr></tbody>`;
+      }
+      document.getElementById("recientes").addEventListener("click", e => {
+        const fila = e.target.closest("tr[data-id]");
+        if (fila) location.href = "revisar.html?id=" + fila.dataset.id;
+      });
+
+      pintar();
+    })();
+  </script>
+</body>
+</html>

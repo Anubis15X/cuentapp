@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 342" width="460" height="342">
+<defs>
+  <filter id="sombra" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".25"/></filter>
+  <filter id="borroso"><feGaussianBlur stdDeviation="0"/></filter>
+  <linearGradient id="arr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".45" stop-color="#000" stop-opacity=".08"/><stop offset=".5" stop-color="#fff" stop-opacity=".3"/><stop offset=".55" stop-color="#000" stop-opacity=".06"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="460" height="342" fill="#d9cdbd"/>
+<g transform="translate(40 40) rotate(0 190 131)">
+  <g >
+  <rect width="380" height="262" fill="#ffffff" filter="url(#sombra)"/>
+  <g font-family="Courier New, monospace" font-size="14" fill="#222"><text x="190" y="43" text-anchor="middle" font-weight="700">PAPELERIA EL LAPIZ</text><text x="190" y="64" text-anchor="middle">NIF 12345678Z</text><line x1="26" x2="354" y1="80" y2="80" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="106">F-2026-0931  09/09/2026</text><text x="26" y="127">FOLIOS A4 x5</text><text x="354" y="127" text-anchor="end">22,50</text><text x="26" y="148">TONER IMPRESORA</text><text x="354" y="148" text-anchor="end">77,50</text><line x1="26" x2="354" y1="164" y2="164" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="190">BASE 21%</text><text x="354" y="190" text-anchor="end">100,00</text><text x="26" y="211">IVA</text><text x="354" y="211" text-anchor="end">21,00</text><text x="26" y="232" font-weight="700">TOTAL 121,00</text></g>
+  
+  </g>
+</g>
+
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 426" width="460" height="426">
+<defs>
+  <filter id="sombra" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".25"/></filter>
+  <filter id="borroso"><feGaussianBlur stdDeviation="0"/></filter>
+  <linearGradient id="arr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".45" stop-color="#000" stop-opacity=".08"/><stop offset=".5" stop-color="#fff" stop-opacity=".3"/><stop offset=".55" stop-color="#000" stop-opacity=".06"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="460" height="426" fill="#d9cdbd"/>
+<g transform="translate(40 40) rotate(-8 190 173)">
+  <g >
+  <rect width="380" height="346" fill="#ffffff" filter="url(#sombra)"/>
+  <g font-family="Courier New, monospace" font-size="14" fill="#222"><text x="190" y="43" text-anchor="middle" font-weight="700">BAR LA ESQUINA</text><text x="190" y="64" text-anchor="middle">NIF: B4??1?8?</text><text x="190" y="85" text-anchor="middle">Pza. Espana 3, Burgos</text><line x1="26" x2="354" y1="101" y2="101" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="127">TICKET 000873   21/10/2026 14:55</text><text x="26" y="148">MESA 4</text><line x1="26" x2="354" y1="164" y2="164" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="190">2 MENU DEL DIA</text><text x="354" y="190" text-anchor="end">28,00</text><text x="26" y="211">1 AGUA GRANDE</text><text x="354" y="211" text-anchor="end">2,50</text><text x="26" y="232">2 CAFE SOLO</text><text x="354" y="232" text-anchor="end">2,50</text><line x1="26" x2="354" y1="248" y2="248" stroke="#444" stroke-dasharray="4 3"/><text x="26" y="274">BASE 10%</text><text x="354" y="274" text-anchor="end">30,00</text><text x="26" y="295">IVA 10%</text><text x="354" y="295" text-anchor="end">3,00</text><text x="26" y="316" font-weight="700">TOTAL          33,00</text></g>
+  
+  </g>
+</g>
+<rect width="460" height="426" fill="#1a0f05" opacity="0.38"/>
+</svg>
