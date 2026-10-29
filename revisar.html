@@ -6,7 +6,7 @@
   <title>Revisar documento · CUENTAPP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600;125,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -97,7 +97,7 @@
       let doc;
       try { doc = await api.obtenerDocumento(id); }
       catch (e) {
-        document.getElementById("contenido").innerHTML = `<div class="vacio-estado"><span class="script">vaya</span>${ui.esc(e.message)}<p><a href="documentos.html">Volver a documentos</a></p></div>`;
+        document.getElementById("contenido").innerHTML = `<div class="vacio-estado"><strong>Vaya</strong>${ui.esc(e.message)}<p><a href="documentos.html">Volver a documentos</a></p></div>`;
         return;
       }
 
@@ -114,7 +114,7 @@
       const url = await api.urlOriginal(doc);
       let zoom = 1, giro = 0;
       if (!url) {
-        $("lienzo").innerHTML = `<div class="vacio-estado" style="color:var(--arena)">Original no disponible en esta demo.</div>`;
+        $("lienzo").innerHTML = `<div class="vacio-estado" style="color:#9a9eab">Original no disponible en esta demo.</div>`;
         $("descargar").classList.add("oculto");
       } else if (url.startsWith("data:application/pdf")) {
         $("lienzo").innerHTML = `<iframe src="${url}" title="Original"></iframe>`;

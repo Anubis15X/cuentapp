@@ -6,14 +6,14 @@
   <title>Documentos · CUENTAPP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600;125,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <main id="contenido" class="contenido">
     <div class="cabecera-pagina">
       <div>
-        <span class="script">tus justificantes</span>
+        <span class="chip">Tus justificantes</span>
         <h1>Documentos</h1>
       </div>
       <a class="btn btn-primario" href="subir.html">Subir documento</a>
@@ -91,7 +91,7 @@
               <td class="der num" style="white-space:nowrap">${ui.dinero(d.factura.total, d.factura.moneda)}</td>
               <td>${ui.pildoraEstado(d)}</td>
             </tr>`).join("")}</tbody>`
-          : `<tbody><tr><td><div class="vacio-estado"><span class="script">nada por aquí</span>No hay documentos con estos filtros.</div></td></tr></tbody>`;
+          : `<tbody><tr><td><div class="vacio-estado"><strong>Nada por aquí</strong>No hay documentos con estos filtros.</div></td></tr></tbody>`;
       }
 
       [selT, selN].forEach(s => s.addEventListener("change", pintar));

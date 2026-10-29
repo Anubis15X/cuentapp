@@ -6,21 +6,21 @@
   <title>Panel · CUENTAPP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600;125,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <main id="contenido" class="contenido">
     <div class="cabecera-pagina">
       <div>
-        <span class="script">el trimestre</span>
+        <span class="chip">Tu trimestre</span>
         <h1>Panel</h1>
       </div>
       <div class="selector-trimestre" id="trimestres" aria-label="Trimestre"></div>
     </div>
 
     <!-- Semáforo -->
-    <section class="tarjeta topo" style="margin-bottom:20px">
+    <section class="tarjeta brillo" style="margin-bottom:20px">
       <div class="resumen-semaforo">
         <div class="semaforo" id="semaforo" role="img"><i></i><i></i><i></i></div>
         <div style="flex:1;min-width:220px">
@@ -162,7 +162,7 @@
               <td class="der num">${ui.dinero(d.factura.total, d.factura.moneda)}</td>
               <td>${ui.pildoraEstado(d)}</td>
             </tr>`).join("")}</tbody>`
-          : `<tbody><tr><td><div class="vacio-estado"><span class="script">todo en calma</span>No hay documentos en este trimestre.</div></td></tr></tbody>`;
+          : `<tbody><tr><td><div class="vacio-estado"><strong>Todo en calma</strong>No hay documentos en este trimestre.</div></td></tr></tbody>`;
       }
       document.getElementById("recientes").addEventListener("click", e => {
         const fila = e.target.closest("tr[data-id]");

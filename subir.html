@@ -6,14 +6,14 @@
   <title>Subir · CUENTAPP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600;125,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <main id="contenido" class="contenido">
     <div class="cabecera-pagina">
       <div>
-        <span class="script">envía tus tickets</span>
+        <span class="chip">Foto, archivo o correo</span>
         <h1>Subir</h1>
       </div>
     </div>
@@ -21,9 +21,10 @@
     <div class="rejilla" id="rejilla" style="grid-template-columns:minmax(0,1fr)">
       <div>
         <!-- Foto desde el móvil (RF-02) -->
-        <label class="tarjeta-flecha" style="cursor:pointer;margin-bottom:16px" for="in-camara">
-          <span id="ico-camara"></span>
+        <label class="tarjeta-via" style="cursor:pointer;margin-bottom:16px" for="in-camara">
+          <span class="icono-via" id="ico-camara"></span>
           <div><strong>Hacer foto</strong><span>Abre la cámara del móvil y fotografía el ticket</span></div>
+          <span class="chip" style="margin-left:auto">Móvil</span>
         </label>
         <input id="in-camara" type="file" accept="image/*" capture="environment" class="oculto">
 
@@ -42,7 +43,7 @@
       <div style="display:flex;flex-direction:column;gap:16px">
         <!-- Reenvío por correo (RF-04 / FA-02) -->
         <section class="tarjeta">
-          <div class="tarjeta-titulo"><h3>Reenvía por correo</h3><span id="ico-correo" style="color:var(--tostado)"></span></div>
+          <div class="tarjeta-titulo"><h3>Reenvía por correo</h3><span id="ico-correo" style="color:var(--oliva)"></span></div>
           <p class="suave" style="font-size:.92rem">Reenvía las facturas que te llegan por email a la dirección de tu empresa. Se procesan los adjuntos PDF, JPG y PNG.</p>
           <div class="buzon-direccion"><span id="buzon" style="flex:1"></span><button class="btn btn-fantasma btn-sm" id="copiar"></button></div>
           <p class="ayuda" style="margin-top:10px">Si el correo no trae adjuntos válidos, te avisaremos sin crear ningún documento.</p>

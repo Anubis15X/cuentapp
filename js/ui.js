@@ -108,7 +108,7 @@
     const diasPrueba = Math.max(0, Math.ceil((new Date(emp.prueba_fin) - new Date()) / 86400000));
     const pct = Math.min(100, Math.round(emp.usados / emp.limite * 100));
 
-    const logo = '<a class="logo" href="panel.html"><b>CUENTAPP</b></a>';
+    const logo = '<a class="logo" href="panel.html"><span class="logo-marca">C</span><b>Cuentapp</b></a>';
     const items = NAV.map(([k, href, t]) =>
       `<a class="nav-item${k === paginaActiva ? " activo" : ""}" href="${href}">${icono(ICONO_NAV[k])}${t}</a>`).join("");
     const lateral = `
@@ -120,7 +120,7 @@
           ${emp.plan === "prueba" ? `Prueba · quedan ${diasPrueba} días` : "Plan CUENTAPP"}
           <div class="uso-barra"><i style="width:${pct}%"></i></div>
           ${emp.usados} / ${emp.limite} documentos
-          <button id="btn-reiniciar" class="btn btn-fantasma btn-sm" style="color:var(--arena);padding:8px 0;margin-top:8px">Reiniciar datos de ejemplo</button>
+          <button id="btn-reiniciar" class="btn btn-fantasma btn-sm">Reiniciar datos de ejemplo</button>
         </div>
       </aside>`;
     const iniciales = (sesion.nombre || "?").slice(0, 1).toUpperCase();

@@ -57,11 +57,14 @@ En el móvil, la barra lateral se sustituye por una barra de navegación inferio
 
 ### Estética
 
-Se basa en un diseño de referencia de Dribbble:
+Se basa en un diseño de referencia de Dribbble de estilo fintech:
 
-- **Fondo:** crema (`#FDE2C2`, `#FBF0E3`).
-- **Texto y botones:** marrones café (`#1C0E03`, `#5F4226`, `#9A622D`).
-- **Tipografías:** Bodoni Moda (títulos), Allura (detalles caligráficos), Oswald (etiquetas) y Jost (texto).
+- **Fondo:** blanco roto (`#F6F7F2`) con un brillo verde lima detrás de las secciones destacadas.
+- **Texto y botones:** casi negro (`#17181D`), con botones en forma de píldora.
+- **Acentos:** lima (`#D4F24A`) para etiquetas y estados activos, y un degradado violeta → lima en el logo.
+- **Titulares:** degradado de negro a oliva.
+- **Tarjetas:** blancas, con sombras suaves; en la portada «flotan» ligeramente giradas.
+- **Tipografías:** Archivo expandida (títulos) y Manrope (texto).
 
 Todos los colores están como variables en `css/styles.css`, así que un cambio de color se hace en un solo sitio.
 

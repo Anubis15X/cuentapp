@@ -7,7 +7,7 @@
   <meta name="description" content="Sube tus tickets y facturas por foto, archivo o correo. CUENTAPP los lee, detecta duplicados y te dice con un semáforo si el trimestre está listo para la gestoría.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Jost:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600;125,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -15,11 +15,12 @@
 
   <header class="cabecera">
     <div class="contenedor">
-      <a class="logo" href="index.html"><b>CUENTAPP</b></a>
+      <a class="logo" href="index.html"><span class="logo-marca">C</span><b>Cuentapp</b></a>
       <nav class="menu">
         <a class="enlace" href="#como-funciona">Cómo funciona</a>
+        <a class="enlace" href="#semaforo">Semáforo</a>
         <a class="enlace" href="precios.html">Precios</a>
-        <a class="btn btn-fantasma btn-sm" href="login.html">Entrar</a>
+        <a class="enlace" href="login.html">Entrar</a>
         <a class="btn btn-primario btn-sm" href="login.html?modo=registro">Prueba gratis</a>
       </nav>
     </div>
@@ -27,29 +28,38 @@
 
   <main>
     <!-- Hero -->
-    <section class="hero topo">
-      <div class="mancha" style="width:520px;height:460px;right:-120px;top:60px"></div>
-      <div class="contenedor hero-grid">
-        <div>
-          <p class="etiqueta">Facturas y tickets para pymes</p>
-          <h1>Llega al cierre del trimestre</h1>
-          <span class="script">sin la tarde perdida</span>
-          <p class="hero-lead">Haz una foto, arrastra un PDF o reenvía un correo. CUENTAPP lee tus justificantes, avisa de duplicados y te dice con un semáforo si está todo listo para tu gestoría.</p>
-          <div class="fila" style="margin-top:28px">
-            <a class="btn btn-primario" href="login.html?modo=registro">Empezar 14 días gratis</a>
-            <a class="btn btn-secundario" href="login.html">Ver la demo</a>
-          </div>
-          <p class="suave" style="font-size:.85rem;margin-top:14px">Sin tarjeta · 30 documentos incluidos en la prueba</p>
+    <section class="hero brillo">
+      <div class="contenedor">
+        <span class="chip-claro chip">✦ Facturas y tickets para pymes</span>
+        <h1><span class="acento">Llega al cierre del trimestre sin la tarde perdida.</span></h1>
+        <p class="hero-lead">Haz una foto, arrastra un PDF o reenvía un correo. CUENTAPP lee tus justificantes, avisa de duplicados y te dice con un semáforo si todo está listo para tu gestoría.</p>
+        <div class="fila" style="margin-top:30px">
+          <a class="btn btn-circulo" href="login.html">
+            <span class="circulo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+            Ver la demo
+          </a>
+          <a class="btn btn-primario" href="login.html?modo=registro">Empezar 14 días gratis</a>
         </div>
+        <p class="suave" style="font-size:.85rem;margin-top:14px">Sin tarjeta · 30 documentos incluidos en la prueba</p>
 
-        <div class="vista-previa">
-          <div class="tarjeta">
+        <!-- Composición de tarjetas flotantes -->
+        <div class="maqueta" aria-hidden="true">
+          <div class="tarjeta flotante flotante-izq">
+            <div class="fila entre"><b>Duplicado</b><span class="pildora p-rojo">Bloquea</span></div>
+            <p class="suave" style="font-size:.85rem;margin:6px 0 14px">Mismo archivo que «super_ribera_15oct.pdf»</p>
+            <div class="aviso aviso-info" style="font-size:.82rem;padding:10px 12px">
+              <span><b>Supermercados Ribera</b><br>15 oct · 45,00 €</span>
+            </div>
+            <p style="font-size:.82rem;margin:12px 0 0;font-weight:600">Resolver incidencia →</p>
+          </div>
+
+          <div class="tarjeta tarjeta-oscura central">
             <div class="fila entre" style="margin-bottom:16px">
               <span class="etiqueta">4T 2026</span>
-              <span class="pildora p-ambar">2 por revisar</span>
+              <span class="chip">2 por revisar</span>
             </div>
             <div class="mini-panel">
-              <div class="semaforo ambar" aria-label="Semáforo en ámbar"><i></i><i></i><i></i></div>
+              <div class="semaforo ambar"><i></i><i></i><i></i></div>
               <div class="mini-stats">
                 <div><b class="num">8</b><span>registrados</span></div>
                 <div><b class="num">5</b><span>validados</span></div>
@@ -57,9 +67,17 @@
                 <div><b class="num">1</b><span>duplicado</span></div>
               </div>
             </div>
-            <div class="aviso aviso-rojo" style="margin-top:16px">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>
-              <span>Posible duplicado: «Fwd_ticket_super.pdf»</span>
+          </div>
+
+          <div class="tarjeta flotante flotante-der">
+            <span class="chip" style="font-size:.7rem;padding:2px 10px">IVA</span>
+            <h3 style="margin:10px 0 4px">Desglose al día</h3>
+            <p class="suave" style="font-size:.85rem;margin:0">Varios tipos en un mismo ticket</p>
+            <div class="meses">
+              <div><i class="hecho">✓</i>4 %</div>
+              <div><i class="ok">✓</i>10 %</div>
+              <div><i class="ok">✓</i>21 %</div>
+              <div><i></i>Total</div>
             </div>
           </div>
         </div>
@@ -67,25 +85,25 @@
     </section>
 
     <!-- Tres vías de subida -->
-    <section class="seccion" id="como-funciona" style="padding-top:24px">
+    <section class="seccion" id="como-funciona">
       <div class="contenedor">
         <div class="rejilla rejilla-2" style="align-items:center;gap:48px">
           <div>
-            <p class="etiqueta">Tres formas de enviar</p>
-            <h2>Tus justificantes llegan como llegan.</h2>
+            <span class="chip">Tres formas de enviar</span>
+            <h2 style="margin-top:14px">Tus justificantes llegan <span class="acento">como llegan.</span></h2>
             <p class="suave">En papel, en el correo o como PDF. CUENTAPP los recoge todos en un solo sitio y conserva siempre el original intacto.</p>
           </div>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div class="tarjeta-flecha">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c2-6 6-11 13-13" stroke-width="1.8"/><path d="M12 5.5 18.5 6l-1.5 6" stroke-width="1.8"/></svg>
+            <div class="tarjeta-via">
+              <span class="icono-via"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>
               <div><strong>Foto</strong><span>Con la cámara del móvil, desde la web</span></div>
             </div>
-            <div class="tarjeta-flecha">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c2-6 6-11 13-13" stroke-width="1.8"/><path d="M12 5.5 18.5 6l-1.5 6" stroke-width="1.8"/></svg>
+            <div class="tarjeta-via">
+              <span class="icono-via"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
               <div><strong>Archivo</strong><span>Arrastra PDF, JPG o PNG desde el ordenador</span></div>
             </div>
-            <div class="tarjeta-flecha">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c2-6 6-11 13-13" stroke-width="1.8"/><path d="M12 5.5 18.5 6l-1.5 6" stroke-width="1.8"/></svg>
+            <div class="tarjeta-via">
+              <span class="icono-via"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg></span>
               <div><strong>Correo</strong><span>Reenvía a tu buzón propio de empresa</span></div>
             </div>
           </div>
@@ -94,31 +112,33 @@
     </section>
 
     <!-- Pasos -->
-    <section class="seccion topo" style="background:#f6e7d6">
+    <section class="seccion" style="padding-top:0">
       <div class="contenedor">
-        <p class="etiqueta">Cómo funciona</p>
-        <h2 style="max-width:18ch">Del ticket arrugado al Excel de la gestoría</h2>
-        <div class="rejilla rejilla-4" style="margin-top:36px">
-          <div class="paso"><span class="paso-num">1</span><div><h3>Envía</h3><p class="suave">Foto, archivo o correo. Se guarda el original en un almacenamiento privado.</p></div></div>
-          <div class="paso"><span class="paso-num">2</span><div><h3>Lee</h3><p class="suave">Fecha, emisor, NIF, número, varios tipos de IVA, total y moneda. Sin inventar lo que no aparece.</p></div></div>
-          <div class="paso"><span class="paso-num">3</span><div><h3>Revisa</h3><p class="suave">El original junto a los datos, con los campos dudosos resaltados. Avisos de duplicados.</p></div></div>
-          <div class="paso"><span class="paso-num">4</span><div><h3>Exporta</h3><p class="suave">Excel por trimestre con el desglose de IVA y el estado de revisión de cada documento.</p></div></div>
+        <div style="text-align:center;max-width:620px;margin:0 auto 40px">
+          <span class="chip">Cómo funciona</span>
+          <h2 style="margin-top:14px">Del ticket arrugado <span class="acento">al Excel de la gestoría</span></h2>
+        </div>
+        <div class="rejilla rejilla-4">
+          <div class="paso"><span class="paso-num">1</span><h3>Envía</h3><p class="suave" style="margin:0">Foto, archivo o correo. El original se guarda en un almacenamiento privado.</p></div>
+          <div class="paso"><span class="paso-num">2</span><h3>Lee</h3><p class="suave" style="margin:0">Fecha, emisor, NIF, número, varios tipos de IVA, total y moneda. Sin inventar lo que no aparece.</p></div>
+          <div class="paso"><span class="paso-num">3</span><h3>Revisa</h3><p class="suave" style="margin:0">El original junto a los datos, con los campos dudosos resaltados y aviso de duplicados.</p></div>
+          <div class="paso"><span class="paso-num">4</span><h3>Exporta</h3><p class="suave" style="margin:0">Excel por trimestre con el desglose de IVA y el estado de revisión de cada documento.</p></div>
         </div>
       </div>
     </section>
 
     <!-- Semáforo -->
-    <section class="seccion">
+    <section class="seccion brillo" id="semaforo">
       <div class="contenedor rejilla rejilla-2" style="align-items:center;gap:48px">
         <div>
-          <p class="etiqueta">El semáforo del trimestre</p>
-          <h2>Sabes en un vistazo <span class="script" style="font-size:1.3em">qué falta</span></h2>
+          <span class="chip">El semáforo del trimestre</span>
+          <h2 style="margin-top:14px">Sabes en un vistazo <span class="acento">qué falta.</span></h2>
           <p class="suave">El semáforo resume el estado de los documentos registrados en CUENTAPP. No sustituye el criterio de tu gestoría, pero te dice dónde mirar.</p>
         </div>
         <div style="display:flex;flex-direction:column;gap:12px">
-          <div class="aviso aviso-verde"><div class="semaforo mini verde"><i></i><i></i><i></i></div><div><b>Verde.</b> Todo revisado y sin incidencias: puedes exportar.</div></div>
-          <div class="aviso aviso-ambar"><div class="semaforo mini ambar"><i></i><i></i><i></i></div><div><b>Ámbar.</b> Datos dudosos, incompletos o sin confirmar.</div></div>
-          <div class="aviso aviso-rojo"><div class="semaforo mini rojo"><i></i><i></i><i></i></div><div><b>Rojo.</b> Duplicados sin resolver o documentos ilegibles.</div></div>
+          <div class="aviso aviso-verde" style="align-items:center"><div class="semaforo mini verde"><i></i><i></i><i></i></div><div><b>Verde.</b> Todo revisado y sin incidencias: puedes exportar.</div></div>
+          <div class="aviso aviso-ambar" style="align-items:center"><div class="semaforo mini ambar"><i></i><i></i><i></i></div><div><b>Ámbar.</b> Datos dudosos, incompletos o sin confirmar.</div></div>
+          <div class="aviso aviso-rojo" style="align-items:center"><div class="semaforo mini rojo"><i></i><i></i><i></i></div><div><b>Rojo.</b> Duplicados sin resolver o documentos ilegibles.</div></div>
         </div>
       </div>
     </section>
@@ -126,11 +146,14 @@
     <!-- CTA -->
     <section class="seccion" style="padding-top:0">
       <div class="contenedor">
-        <div class="tarjeta topo" style="background:var(--degradado-cafe);color:var(--crema);text-align:center;padding:56px 24px;border:0">
-          <h2 style="color:var(--crema);text-transform:uppercase">Pruébalo con tus tickets</h2>
-          <span class="script" style="font-size:2.6rem;color:var(--arena);display:block;margin-bottom:16px">14 días gratis</span>
-          <a class="btn btn-primario" style="background:var(--crema);color:var(--cafe)" href="login.html?modo=registro">Crear cuenta</a>
-          <p style="margin:16px 0 0;color:var(--arena);font-size:.9rem">Después, 20 € al mes + IVA por empresa. <a href="precios.html" style="color:var(--crema)">Ver planes</a></p>
+        <div class="tarjeta tarjeta-oscura plan destacado" style="text-align:center;padding:64px 24px;align-items:center">
+          <span class="chip">14 días gratis</span>
+          <h2 style="margin:16px 0 12px;color:#fff">Pruébalo con tus tickets</h2>
+          <p class="suave" style="max-width:44ch;margin:0 auto 26px">Después, 20 € al mes + IVA por empresa. Cancela cuando quieras.</p>
+          <div class="fila" style="justify-content:center">
+            <a class="btn btn-lima" href="login.html?modo=registro">Crear cuenta</a>
+            <a class="btn btn-fantasma" style="color:#fff" href="precios.html">Ver planes</a>
+          </div>
         </div>
       </div>
     </section>
